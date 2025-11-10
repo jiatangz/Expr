@@ -23,11 +23,17 @@ COMMANDS = [
     Command(
         value=[1, 2],
         pattern="-threads={}",
-        suffix="-suffix_{}"
+        suffix="-suffix_{}",
+        symbols=["t1", "t2"],
     ),
     Command(
         value=[64, 128],
         pattern="-buffer_size={}"
+    ),
+    Command(
+        value=[1, 2, 3],
+        pattern="",
+        suffix="_run_{}.txt"
     )
 ]
 

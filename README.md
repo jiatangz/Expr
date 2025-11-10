@@ -58,6 +58,18 @@ Command(
 
 <br>
 
+In some cases, we may need a special suffix instead of using the value, for example when the value itself is the command
+```python
+Command(
+    value=["-v1 -v5", "-v2 -v3", "-v4"],
+    pattern="{}",
+    suffix="{}",
+    symbols=["name1", "name2", "name3"]
+)
+```
+If we specify the symbols, then when compute the suffix, it will use the symbol instead of value as the suffix, note `len(value) == len(symbols)`
+
+
 ## Result Parser
 
 ```python

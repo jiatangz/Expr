@@ -33,9 +33,9 @@ class Rule:
 @dataclass
 class Command:
     value: List
-    pattern: str
+    pattern: str = ""
     suffix: str = None
-
+    symbols: str = None
     def __post_init__(self):
         if self.suffix is None:
             self.suffix = self.pattern
@@ -43,16 +43,17 @@ class Command:
 
 def __expand_commands__(commands: List[Command]):
     value_lists = [cmd.value for cmd in commands]
-    for combo in product(*value_lists):
+    symbol_lists = [cmd.symbols if cmd.symbols else cmd.value for cmd in commands]
+    for combo, symbols in zip(product(*value_lists), product(*symbol_lists)):
         parts = []
         suffixes = []
-        for (cmd, val) in zip(commands, combo):
+        for (cmd, val, symbol) in zip(commands, combo, symbols):
             if isinstance(val, (list, tuple)):
                 parts.append(cmd.pattern.format(*val))
-                suffixes.append(cmd.suffix.format(*val))
+                suffixes.append(cmd.suffix.format(*symbol))
             else:
                 parts.append(cmd.pattern.format(val))
-                suffixes.append(cmd.suffix.format(val))
+                suffixes.append(cmd.suffix.format(symbol))
         yield " ".join(parts), "".join(suffixes)
 
 
