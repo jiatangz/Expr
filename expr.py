@@ -1,6 +1,7 @@
 import re
 import os
 from dataclasses import dataclass
+import shlex
 import subprocess
 from typing import Callable, List
 from itertools import product
@@ -115,7 +116,7 @@ def execute(basic_cmd:str, commands:List[Command], filename: str, log_dir='./', 
     for custom_cmd, suffix in __expand_commands__(commands):
         cmd = " ".join([basic_cmd, custom_cmd])
         if run:
-            __run_cmd__(log_dir=log_dir, filename=filename+suffix, cmd=cmd)
+            __run_cmd__(log_dir=log_dir, filename=filename+suffix, cmd=shlex.split(cmd))
         else:
             print(cmd + " >> " + os.path.join(log_dir, filename + suffix))
 
