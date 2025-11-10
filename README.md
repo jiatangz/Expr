@@ -123,5 +123,28 @@ def expr_max(l):
     return max(map(float, l))
 ```
 
-## TODO
-1. output the parse results to csv
+## Dict to CSV
+Then we can simply convert results to CSV file, assume the last command is the replicates.
+
+```python
+filename = "test"
+COMMANDS = [
+    # ... other Commands
+    Command(
+        value=[1, 2, 3],
+        pattern="",
+        suffix="_{}.txt"
+    )
+]
+# group by the last command
+groups = [
+    [os.path.join("./sample_output", f"{filename}{s1}{s2}") 
+    for _, s2 in expand_commands(COMMANDS[-1:])]
+    for _, s1 in expand_commands(COMMANDS[:-1])
+]
+# for each group, compute the result
+results = [from_files(FIELDS, group, exp="exp1") for group in groups]
+# dump the results to CSV file
+dict_to_csv(results, "./sample_output/out.csv")
+```
+
