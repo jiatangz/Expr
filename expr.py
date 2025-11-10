@@ -1,7 +1,7 @@
 import csv
 import re
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import shlex
 import subprocess
 from typing import Any, Callable, Iterable, List
@@ -34,19 +34,27 @@ class Rule:
 
 @dataclass
 class Command:
-    value: List
+    name: str = ""
+    value: List = field(default_factory=list)
     pattern: str = ""
     suffix: str = None
     symbols: str = None
 
     def __post_init__(self):
+        assert self.name is not None and self.name != "", "Error, each command should have a unique name"
         if self.suffix is None:
             self.suffix = self.pattern
         if self.symbols:
-            assert len(self.value) == len(self.symbols)
+            assert len(self.value) == len(self.symbols), "Error, len(values) != len(symbols)"
+
+@dataclass
+class CombineCommand:
+    cmd: str
+    suffix: str
+    params: dict[str, Any]
 
 
-def expand_commands(commands: List[Command]) -> Iterable[tuple[str, str]]:
+def expand_commands(commands: List[Command]) -> Iterable[CombineCommand]:
     """
     Compute Cartesian product of given command list, return cmd and suffix
     if commands is an empty list, then it still yield once (empty string)
@@ -55,22 +63,23 @@ def expand_commands(commands: List[Command]) -> Iterable[tuple[str, str]]:
        commands: List[Command]
 
     Returns:
-        Iterable[tuple[str, str]]: return joined cmd (separate by space) and suffix
+        Iterable[CombineCommand]: return cmd (separate by space), suffix, and value of cmd(in dict)
     """
-     
     value_lists = [cmd.value for cmd in commands]
     symbol_lists = [cmd.symbols if cmd.symbols else cmd.value for cmd in commands]
     for combo, symbols in zip(product(*value_lists), product(*symbol_lists)):
         parts = []
         suffixes = []
+        params = {}
         for (cmd, val, symbol) in zip(commands, combo, symbols):
+            params[cmd.name] = val
             if isinstance(val, (list, tuple)):
                 parts.append(cmd.pattern.format(*val))
                 suffixes.append(cmd.suffix.format(*symbol))
             else:
                 parts.append(cmd.pattern.format(val))
                 suffixes.append(cmd.suffix.format(symbol))
-        yield " ".join(parts), "".join(suffixes)
+        yield CombineCommand(cmd=" ".join(parts), suffix="".join(suffixes), params=params)
 
 
 def __read_file__(filename: str):
@@ -128,12 +137,24 @@ def from_files(fields: List[Rule], filenames: List[str], **kwargs) -> dict[str, 
 
 
 def execute(basic_cmd:str, commands:List[Command], filename: str, log_dir='./', run=True):
-    for custom_cmd, suffix in expand_commands(commands):
+    for ccommand in expand_commands(commands):
+        custom_cmd, suffix = ccommand.cmd, ccommand.suffix
         cmd = " ".join([basic_cmd, custom_cmd])
         if run:
             __run_cmd__(log_dir=log_dir, filename=filename+suffix, cmd=shlex.split(cmd))
         else:
             print(cmd + " >> " + os.path.join(log_dir, filename + suffix))
+
+
+def parse(commands:List[Command], fields: List[Rule], filename:str, out_csv:str, log_dir='./'):
+    # assume group by the last cmd
+    groups = [
+        ([os.path.join(log_dir, f"{filename}{c1.suffix}{c2.suffix}") 
+        for c2 in expand_commands(commands[-1:])], c1.params)
+        for c1 in expand_commands(commands[:-1])
+    ]
+    results = [from_files(fields, group, **param) for group, param in groups]
+    dict_to_csv(results, out_csv)
 
 
 def dict_to_csv(data: list[dict], csv_file: str):

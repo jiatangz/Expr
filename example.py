@@ -21,16 +21,19 @@ FIELDS = [
 
 COMMANDS = [
     Command(
+        name="threads",
         value=[1, 2],
         pattern="-threads={}",
         suffix="-suffix_{}",
         symbols=["t1", "t2"],
     ),
     Command(
+        name="buffer_size",
         value=[64, 128],
         pattern="-buffer_size={}"
     ),
     Command(
+        name="runs",
         value=[1, 2, 3],
         pattern="",
         suffix="_run_{}.txt"
@@ -55,15 +58,23 @@ if __name__ == '__main__':
     filename = "test"
     COMMANDS = [
         Command(
+            name="thread",
+            value=[1, 2, 3],
+            pattern="-thread={}",
+            suffix=""
+        ),
+        Command(
+            name="runs",
             value=[1, 2, 3],
             pattern="",
             suffix="_{}.txt"
         )
     ]
-    groups = [
-        [os.path.join("./sample_output", f"{filename}{s1}{s2}") 
-        for _, s2 in expand_commands(COMMANDS[-1:])]
-        for _, s1 in expand_commands(COMMANDS[:-1])
-    ]
-    results = [from_files(FIELDS, group, exp="exp1") for group in groups]
-    dict_to_csv(results, "./sample_output/out.csv")
+    # groups = [
+    #     ([os.path.join("./sample_output", f"{filename}{c1.suffix}{c2.suffix}") 
+    #     for c2 in expand_commands(COMMANDS[-1:])], c1.params)
+    #     for c1 in expand_commands(COMMANDS[:-1])
+    # ]
+    # results = [from_files(FIELDS, group, **param) for group, param in groups]
+    # dict_to_csv(results, "./sample_output/out.csv")
+    parse(COMMANDS, FIELDS, filename, "./sample_output/out.csv", "./sample_output")

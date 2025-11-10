@@ -129,6 +129,12 @@ Then we can simply convert results to CSV file, assume the last command is the r
 ```python
 filename = "test"
 COMMANDS = [
+    Command(
+        name="thread",
+        value=[1, 2, 3],
+        pattern="-thread={}",
+        suffix=""
+    ),
     # ... other Commands
     Command(
         value=[1, 2, 3],
@@ -136,15 +142,17 @@ COMMANDS = [
         suffix="_{}.txt"
     )
 ]
-# group by the last command
+
+# group by the last command, params is the combination of commands
 groups = [
-    [os.path.join("./sample_output", f"{filename}{s1}{s2}") 
-    for _, s2 in expand_commands(COMMANDS[-1:])]
-    for _, s1 in expand_commands(COMMANDS[:-1])
+    ([os.path.join("./sample_output", f"{filename}{c1.suffix}{c2.suffix}") 
+    for c2 in expand_commands(COMMANDS[-1:])], c1.params)
+    for c1 in expand_commands(COMMANDS[:-1])
 ]
+
 # for each group, compute the result
-results = [from_files(FIELDS, group, exp="exp1") for group in groups]
+results = [from_files(FIELDS, group, **param) for group, param in groups]
+
 # dump the results to CSV file
 dict_to_csv(results, "./sample_output/out.csv")
 ```
-
