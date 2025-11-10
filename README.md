@@ -10,10 +10,12 @@ from expr import *
 
 COMMANDS = [
     Command(
+        name="threads",
         value=[1, 2],
         pattern="-threads={}"
     ),
     Command(
+        name="buffer",
         value=[64, 128],
         pattern="-buffer_size={}"
     )
@@ -39,6 +41,7 @@ Will compute the Cartesian product of the commands and join with the base comman
 By default, the filename suffix is the same as the pattern, but you can also specify a custom suffix (similar to pattern)
 ```python
 Command(
+    name="xxx",
     value=[1, 2],
     pattern="-threads={}",
     suffix="-suffix_{}"
@@ -51,6 +54,7 @@ Will give you output to `./test-suffix_1-buffer_size=64` etc.
 If the value is a List or Tuple, it will also expand the list to match with pattern.
 ```python
 Command(
+    name="xxx",
     value=[(1, 2), (3, 4)],
     pattern="a={}, b={}"
 )
@@ -61,6 +65,7 @@ Command(
 In some cases, we may need a special suffix instead of using the value, for example when the value itself is the command
 ```python
 Command(
+    name="xxx",
     value=["-v1 -v5", "-v2 -v3", "-v4"],
     pattern="{}",
     suffix="{}",
@@ -137,6 +142,7 @@ COMMANDS = [
     ),
     # ... other Commands
     Command(
+        name="runs",
         value=[1, 2, 3],
         pattern="",
         suffix="_{}.txt"
