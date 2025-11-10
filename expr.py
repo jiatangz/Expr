@@ -40,6 +40,8 @@ class Command:
     def __post_init__(self):
         if self.suffix is None:
             self.suffix = self.pattern
+        if self.symbols:
+            assert len(self.value) == len(self.symbols)
 
 
 def __expand_commands__(commands: List[Command]):
