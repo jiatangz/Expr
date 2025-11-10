@@ -1,0 +1,15 @@
+agg_nosync_throughput: 242557 ops/sec
+avg_nosync_per_core_throughput: 121278 ops/sec/core
+agg_throughput: 242550 ops/sec
+avg_per_core_throughput: 121275 ops/sec/core
+avg_latency: 52.2234 ms
+agg_abort_rate: 0.299528 aborts/sec
+avg_per_core_abort_rate: 0.149764 aborts/sec/core
+min_latency: 6.50551 ms
+p50_latency: 54.7087 ms
+p90_latency: 73.3932 ms
+p95_latency: 75.4048 ms
+p99_latency: 77.879 ms
+p999_latency: 88.172 ms
+p9999_latency: 95.26 ms
+max_latency: 95.4199 ms
