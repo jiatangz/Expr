@@ -97,10 +97,10 @@ def __merge_result__(result: dict, **kwargs):
 
 def __run_cmd__(log_dir: str, filename: str, cmd: str):
     os.makedirs(log_dir, exist_ok=True)
+    filename = os.path.join(log_dir, filename)
     if os.path.exists(filename):
         print(f"[SKIP] {filename} already exists.")
         return
-    filename = os.path.join(log_dir, filename)
     print(f"[RUN] {filename}")
     with open(filename, "w") as f:
         subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT)
