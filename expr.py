@@ -72,7 +72,7 @@ def expand_commands(commands: List[Command]) -> Iterable[CombineCommand]:
         suffixes = []
         params = {}
         for (cmd, val, symbol) in zip(commands, combo, symbols):
-            params[cmd.name] = val
+            params[cmd.name] = symbol
             if isinstance(val, (list, tuple)):
                 parts.append(cmd.pattern.format(*val))
                 suffixes.append(cmd.suffix.format(*symbol))
